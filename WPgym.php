@@ -88,3 +88,5 @@ load_plugin_textdomain(wygym_domain, false, dirname(plugin_basename(__FILE__)) .
 // Including Files
 
 require_once wygym_path . '/inc/class-activation.php';
+require_once wygym_path . '/inc/class-scripts.php';
+require_once wygym_path . '/admin/admin-pages.php';
