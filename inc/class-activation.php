@@ -21,7 +21,7 @@ class WygymActication
     {
         // Plugin Activation
         /**
-         * Adding admin page
+         * Adding admin page test comment
          */
     }
 }
