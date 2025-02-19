@@ -1,0 +1,20 @@
+{
+    "name": "adeeldev/wpgym",
+    "description": "Wp Project for gym management with access control",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Muhammad Adeel",
+            "email": "wpadeeldev@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Adeeldev\\Wpgym\\": "src/"
+        }
+    },
+    "require": {
+        "htmlburger/carbon-fields": "^3.6"
+    }
+}
