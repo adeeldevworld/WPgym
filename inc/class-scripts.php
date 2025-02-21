@@ -41,17 +41,6 @@ class WPGym_Asset_Loader
      */
     public function enqueue_admin_assets($hook)
     {
-        // Check if we are on one of the WPGym admin pages
-        $wpgym_pages = [
-            'toplevel_page_wpgym-dashboard',   
-            'wpgym-dashboard_page_wpgym-membership-plans', 
-            'wpgym-dashboard_page_wpgym-user-management', 
-            'wpgym-dashboard_page_wpgym-settings', 
-        ];
-
-        if (!in_array($hook, $wpgym_pages)) {
-            return; // Exit if not on a WPGym admin page
-        }
 
         wp_enqueue_style(
             'bootstrap-admin-css',

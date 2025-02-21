@@ -95,3 +95,5 @@ require_once wygym_path . '/inc/class-peachpayment.php';
 require_once wygym_path . '/inc/class-acessControl.php';
 require_once wygym_path . '/inc/class-setting-fields.php';
 require_once wygym_path . '/admin/admin-pages.php';
+require_once wygym_path . '/membership/membership-manager.php';
+require_once wygym_path . '/users/class-user-registration.php';
