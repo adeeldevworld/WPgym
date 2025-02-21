@@ -84,6 +84,13 @@ class WPGym_Admin_Pages
     {
     ?>
         <div class="wrap">
+            <style>
+                .badge {
+                    font-size: 0.875rem;
+                    padding: 0.475rem 0.85rem;
+                    text-transform: capitalize;
+                }
+            </style>
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="m-0"><?= __('User Management', 'wpgym') ?></h1>
             </div>
@@ -97,13 +104,14 @@ class WPGym_Admin_Pages
                             <th scope="col"><?= __('Email', 'wpgym') ?></th>
                             <th scope="col"><?= __('Membership Type', 'wpgym') ?></th>
                             <th scope="col" class="text-center"><?= __('Status', 'wpgym') ?></th>
+                            <th scope="col" class="text-center"><?= __('Payment', 'wpgym') ?></th>
                             <th scope="col" class="text-center"><?= __('Start Date', 'wpgym') ?></th>
                             <th scope="col" class="text-center"><?= __('End Date', 'wpgym') ?></th>
                             <th scope="col" class="text-center"><?= __('Actions', 'wpgym') ?></th>
                         </tr>
                     </thead>
                     <tbody id="gym-members-list">
-                        <!-- This will be populated via AJAX -->
+
                     </tbody>
                 </table>
             </div>
