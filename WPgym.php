@@ -85,8 +85,13 @@ if (!defined('wygym__mainfile')) {
 }
 load_plugin_textdomain(wygym_domain, false, dirname(plugin_basename(__FILE__)) . '/languages/');
 
-// Including Files
+// Load Composer dependencies
+require_once wygym_path . '/vendor/autoload.php';
 
+// Including Files
 require_once wygym_path . '/inc/class-activation.php';
 require_once wygym_path . '/inc/class-scripts.php';
+require_once wygym_path . '/inc/class-peachpayment.php';
+require_once wygym_path . '/inc/class-acessControl.php';
+require_once wygym_path . '/inc/class-setting-fields.php';
 require_once wygym_path . '/admin/admin-pages.php';
