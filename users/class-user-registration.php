@@ -73,15 +73,11 @@ class GymMembershipRegistration {
     // AJAX methods will be implemented here
     // Add these methods to the GymMembershipRegistration class
 
+   //should be updated
     public function ajax_get_gym_members() {
-        if (!check_ajax_referer('gym_members_nonce', 'nonce', false)) {
-            $this->log_error('Nonce verification failed');
-            wp_send_json_error('Nonce verification failed', 400);
-        }
-    
+        check_ajax_referer('gym_members_nonce', 'nonce');
         if (!current_user_can('manage_options')) {
-            $this->log_error('Unauthorized access attempt');
-            wp_send_json_error('Unauthorized', 403);
+            wp_send_json_error('Unauthorized');
         }
     
         $users = get_users(array(
@@ -90,41 +86,35 @@ class GymMembershipRegistration {
             'order' => 'DESC'
         ));
     
-        if (empty($users)) {
-            $this->log_error('No gym members found');
-            wp_send_json_error('No gym members found', 404);
-        }
-    
         ob_start();
-        foreach ($users as $user) {
-            $unique_id = get_user_meta($user->ID, 'unique_id', true);
-            $membership_type_id = get_user_meta($user->ID, 'membership_type', true);
-            $membership_type = $this->get_membership_type_name($membership_type_id);
-            $status = get_user_meta($user->ID, 'status', true);
-            $registration_date = get_user_meta($user->ID, 'registration_date', true);
-            $end_date = get_user_meta($user->ID, 'end_date', true);
-            ?>
-            <tr>
-                <td><?php echo esc_html($unique_id); ?></td>
-                <td><?php echo esc_html($user->user_login); ?></td>
-                <td><?php echo esc_html($user->user_email); ?></td>
-                <td><?php echo esc_html($membership_type); ?></td>
-                <td><?php echo esc_html($status); ?></td>
-                <td><?php echo esc_html($registration_date); ?></td>
-                <td><?php echo esc_html($end_date); ?></td>
-                <td>
-                    <button class="edit-member button" data-id="<?php echo $user->ID; ?>">Edit</button>
-                    <button class="delete-member button" data-id="<?php echo $user->ID; ?>">Delete</button>
-                </td>
-            </tr>
-            <?php
+        if (empty($users)) {
+            echo '<tr><td colspan="7">No gym members found.</td></tr>';
+        } else {
+            foreach ($users as $user) {
+                $unique_id = get_user_meta($user->ID, 'unique_id', true);
+                $membership_type_id = get_user_meta($user->ID, 'membership_type', true);
+                $membership_type = $this->get_membership_type_name($membership_type_id);
+                $status = get_user_meta($user->ID, 'status', true);
+                $registration_date = get_user_meta($user->ID, 'registration_date', true);
+                $end_date = get_user_meta($user->ID, 'end_date', true);
+                ?>
+                <tr>
+                    <td><?php echo esc_html($unique_id); ?></td>
+                    <td><?php echo esc_html($user->user_login); ?></td>
+                    <td><?php echo esc_html($user->user_email); ?></td>
+                    <td><?php echo esc_html($membership_type); ?></td>
+                    <td><?php echo esc_html($status); ?></td>
+                    <td><?php echo esc_html($registration_date); ?></td>
+                    <td><?php echo esc_html($end_date); ?></td>
+                    <td>
+                        <button class="edit-member button" data-id="<?php echo $user->ID; ?>">Edit</button>
+                        <button class="delete-member button" data-id="<?php echo $user->ID; ?>">Delete</button>
+                    </td>
+                </tr>
+                <?php
+            }
         }
         $html = ob_get_clean();
-    
-        if (empty($html)) {
-            $this->log_error('No gym members data generated');
-            wp_send_json_error('No gym members data generated', 500);
-        }
     
         wp_send_json_success($html);
     }
@@ -390,7 +380,7 @@ private function get_membership_type_name($id) {
 private function calculate_end_date($membership_type_id, $start_date) {
     global $wpdb;
     $table_name = $wpdb->prefix . 'memberships';
-    $duration = strtolower($wpdb->get_var($wpdb->prepare("SELECT type FROM $table_name WHERE id = %d", $membership_type_id));
+    $duration = strtolower($wpdb->get_var($wpdb->prepare("SELECT type FROM $table_name WHERE id = %d", $membership_type_id)));
 
     if (!$duration) {
         return date('Y-m-d H:i:s', strtotime('+30 days', strtotime($start_date))); // Default to 30 days if duration not found

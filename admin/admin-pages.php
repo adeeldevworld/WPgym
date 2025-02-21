@@ -129,6 +129,7 @@ class WPGym_Admin_Pages {
         <p>
             <label for="membership-type">Membership Type:</label>
             <select id="membership-type" name="membership_type">
+                <option value="">Select Membership Type</option>
                 <?php
                 global $wpdb;
                 $table_name = $wpdb->prefix . 'memberships';
