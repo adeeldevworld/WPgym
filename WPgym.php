@@ -90,3 +90,6 @@ load_plugin_textdomain(wygym_domain, false, dirname(plugin_basename(__FILE__)) .
 require_once wygym_path . '/inc/class-activation.php';
 require_once wygym_path . '/inc/class-scripts.php';
 require_once wygym_path . '/admin/admin-pages.php';
+require_once wygym_path . '/membership/membership-manager.php';
+require_once wygym_path . '/users/class-user-registration.php';
+//new Custom_User_Registration();
