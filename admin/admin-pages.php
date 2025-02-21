@@ -40,15 +40,6 @@ class WPGym_Admin_Pages {
             'wpgym-user-management',
             [$this, 'render_user_management']
         );
-
-        add_submenu_page(
-            'wpgym-dashboard',
-            'Settings',
-            'Settings',
-            'manage_options',
-            'wpgym-settings',
-            [$this, 'render_settings']
-        );
     }
 
     public function render_dashboard() {
@@ -74,15 +65,6 @@ class WPGym_Admin_Pages {
         <div class="wrap">
             <h1>User Management</h1>
             <p>Manage gym users and their details here.</p>
-        </div>
-        <?php
-    }
-
-    public function render_settings() {
-        ?>
-        <div class="wrap">
-            <h1>Settings</h1>
-            <p>Customize WPGym settings here.</p>
         </div>
         <?php
     }
