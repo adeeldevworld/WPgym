@@ -39,7 +39,7 @@ class PeachPayments
         ];
     }
 
-    public static function initiatePayment($amount, $currency, $paymentBrand, $paymentType, $shopperResultUrl)
+    public static function initiatePayment($merchantID ,$amount, $currency, $paymentBrand, $paymentType, $shopperResultUrl)
     {
         $url = self::BASE_URL . '/payments';
 
@@ -52,7 +52,7 @@ class PeachPayments
         // Request payload
         $data = [
             'authentication' => $authentication,
-            'merchantTransactionId' => uniqid('wpgym_' , true),
+            'merchantTransactionId' => $merchantID,
             'amount' => $amount,
             'currency' => $currency,
             'paymentBrand' => $paymentBrand,

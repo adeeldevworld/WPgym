@@ -84,74 +84,41 @@ class WPGym_Admin_Pages
     {
     ?>
         <div class="wrap">
-            <h1>User Management</h1>
-            <!-- templates/admin-page.php -->
-            <div class="wrap">
-                <table class="wp-list-table widefat fixed striped">
-                    <thead>
-                        <tr>
-                            <th>Unique Id</th>
+            <style>
+                .badge {
+                    font-size: 0.875rem;
+                    padding: 0.475rem 0.85rem;
+                    text-transform: capitalize;
+                }
+            </style>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="m-0"><?= __('User Management', 'wpgym') ?></h1>
+            </div>
 
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Membership Type</th>
-                            <th>Status</th>
-                            <th>Membership Start Date</th>
-                            <th>End Date</th>
-                            <th>Actions</th>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle shadow-sm">
+                    <thead class="table-light small text-muted">
+                        <tr>
+                            <th scope="col" class="text-center"><?= __('Unique ID', 'wpgym') ?></th>
+                            <th scope="col"><?= __('Username', 'wpgym') ?></th>
+                            <th scope="col"><?= __('Email', 'wpgym') ?></th>
+                            <th scope="col"><?= __('Membership Type', 'wpgym') ?></th>
+                            <th scope="col" class="text-center"><?= __('Status', 'wpgym') ?></th>
+                            <th scope="col" class="text-center"><?= __('Payment', 'wpgym') ?></th>
+                            <th scope="col" class="text-center"><?= __('Start Date', 'wpgym') ?></th>
+                            <th scope="col" class="text-center"><?= __('End Date', 'wpgym') ?></th>
+                            <th scope="col" class="text-center"><?= __('Actions', 'wpgym') ?></th>
                         </tr>
                     </thead>
                     <tbody id="gym-members-list">
-                        <!-- This will be populated via AJAX -->
+
                     </tbody>
                 </table>
             </div>
 
-            <div id="member-modal" style="display:none;">
-                <form id="member-form">
-                    <input type="hidden" id="user-id" name="user_id">
-                    <p>
-                        <label for="username">Username:</label>
-                        <input type="text" id="username" name="username" required>
-                    </p>
-                    <p>
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" required>
-                    </p>
-                    <p>
-                        <label for="password">Password:</label>
-                        <input type="password" id="password" name="password">
-                    </p>
-                    <p>
-                        <label for="membership-type">Membership Type:</label>
-                        <select id="membership-type" name="membership_type">
-                            <?php
-                            global $wpdb;
-                            $table_name = $wpdb->prefix . 'memberships';
-                            $results = $wpdb->get_results("SELECT id, type, price FROM $table_name", ARRAY_A);
-                            $membership_types = $results;
-                            foreach ($membership_types as $type) {
-                                echo '<option value="' . esc_attr($type['id']) . '" data-price="' . esc_attr($type['price']) . '">' . esc_html($type['type']) . ' - $' . esc_html($type['price']) . '</option>';
-                            }
-                            ?>
-                        </select>
-                    </p>
-                    <p>
-                        <label for="price">Price:</label>
-                        <input type="text" id="price" name="price" readonly>
-                    </p>
-                    <p>
-                        <label for="status">Status:</label>
-                        <select id="status" name="status">
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
-                    </p>
-                    <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('gym_members_nonce'); ?>">
-
-                    <button type="submit" class="button button-primary">Save Member</button>
-                </form>
-            </div>
+            <?php
+            require_once wygym_path . '/users/templates/update-from.php';
+            ?>
         </div>
 
 

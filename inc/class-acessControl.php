@@ -1,5 +1,5 @@
 <?php
-
+namespace WPGymAccessControl;
 class WPGymAccessControl
 {
     private static $apiKey = 'SEZWANxMOGYM';
