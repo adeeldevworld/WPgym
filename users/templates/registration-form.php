@@ -15,6 +15,8 @@
     <p>
         <label for="membership-type">Membership Type:</label>
         <select id="membership-type" name="membership_type">
+            <option value="">Select Membership Type</option>
+            
             <?php
             $membership_types = $this->get_membership_types();
             foreach ($membership_types as $type) {
