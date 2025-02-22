@@ -50,10 +50,16 @@ jQuery(document).ready(function($) {
             success: function(response) {
                 console.log('AJAX response:', response);
                 if (response.success) {
-                    alert('Membership added successfully!');
-                    window.location.href = 'admin.php?page=membership-manager';
+                    //alert('Membership added successfully!');
+                    //window.location.href = 'admin.php?page=membership-manager';
+                    showAdminNotice(response.data.notice);
+                    $('#add-membership-modal').hide();
+                    location.reload();
+
+
                 } else {
-                    alert('Error: ' + response.data);
+                   // alert('Error: ' + response.data);
+                   showAdminNotice(response.data.notice);
                 }
             },
             error: function(xhr, status, error) {
@@ -64,7 +70,8 @@ jQuery(document).ready(function($) {
                     readyState: xhr.readyState,
                     statusText: xhr.statusText
                 });
-                alert('An error occurred while adding the membership. Status: ' + status + ', Error: ' + error + ', Response: ' + xhr.responseText);
+               // alert('An error occurred while adding the membership. Status: ' + status + ', Error: ' + error + ', Response: ' + xhr.responseText);
+               showAdminNotice(response.data.notice);
             }
         });
     });
@@ -100,12 +107,15 @@ jQuery(document).ready(function($) {
                     // Show the modal
                     $('#edit-membership-modal').show();
                 } else {
-                    alert('Error: ' + response.data);
+                    //alert('Error: ' + response.data);
+                    showAdminNotice(response.data.notice);
                 }
             }
         });
     });
-    
+    $('.add-membership').on('click', function() {
+        $('#add-membership-modal').show();
+    });
 
     $('#edit-membership-form').on('submit', function(e) {
         e.preventDefault();
@@ -121,10 +131,12 @@ jQuery(document).ready(function($) {
             },
             success: function(response) {
                 if (response.success) {
-                    alert('Membership updated successfully!');
+                    //alert('Membership updated successfully!');
                     location.reload();
+                    showAdminNotice(response.data.notice);
                 } else {
-                    alert('Error: ' + response.data);
+                    //alert('Error: ' + response.data);
+                    showAdminNotice(response.data.notice);
                 }
             }
         });
@@ -132,6 +144,9 @@ jQuery(document).ready(function($) {
 
     $('#edit-cancel').on('click', function() {
         $('#edit-membership-modal').hide();
+    });
+    $('#add-cancel').on('click', function() {
+        $('#add-membership-modal').hide();
     });
 
     // Delete membership
@@ -149,13 +164,28 @@ jQuery(document).ready(function($) {
                 },
                 success: function(response) {
                     if (response.success) {
-                        alert('Membership deleted successfully!');
+                       // alert('Membership deleted successfully!');
+                       showAdminNotice(response.data.notice);
                         location.reload();
                     } else {
-                        alert('Error: ' + response.data);
+                        //alert('Error: ' + response.data);
+                        showAdminNotice(response.data.notice);
                     }
                 }
             });
         }
     });
+    function showAdminNotice(notice) {
+        var $noticeContainer = $('#gym-management-notices');
+        if (!$noticeContainer.length) {
+            $noticeContainer = $('<div id="gym-management-notices"></div>');
+            $('.wrap h1').after($noticeContainer);
+        }
+        $noticeContainer.html(notice);
+        
+        // Set up dismissible notices
+        $('.notice-dismiss').on('click', function() {
+            $(this).closest('.notice').remove();
+        });
+    }
 });

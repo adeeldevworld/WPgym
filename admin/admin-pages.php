@@ -36,8 +36,8 @@ class WPGym_Admin_Pages
             'wpgym-membership-plans',
             [$this, 'render_membership_plans']
         );
-        add_submenu_page('wpgym-membership-plans', 'All Memberships', 'All Memberships', 'manage_options', 'membership-manager', array($this, 'render_membership_plans'));
-        add_submenu_page('wpgym-membership-plans', 'Add New Membership', 'Add New Membership', 'manage_options', 'add-new-membership', array($this, 'add_new_membership_page'));
+        // add_submenu_page('wpgym-membership-plans', 'All Memberships', 'All Memberships', 'manage_options', 'membership-manager', array($this, 'render_membership_plans'));
+        // add_submenu_page('wpgym-membership-plans', 'Add New Membership', 'Add New Membership', 'manage_options', 'add-new-membership', array($this, 'add_new_membership_page'));
 
         add_submenu_page(
             'wpgym-dashboard',
@@ -61,18 +61,11 @@ class WPGym_Admin_Pages
 
     public function render_membership_plans()
     {
-    ?>
-        <div class="wrap">
-            <?php
             global $wpdb;
             $table_name = $wpdb->prefix . 'memberships';
             $memberships = $wpdb->get_results("SELECT * FROM $table_name");
 
             include(plugin_dir_path(__FILE__) . '../membership/templates/memberships-list.php');
-            ?>
-
-        </div>
-    <?php
     }
     public function add_new_membership_page()
     {
@@ -83,7 +76,7 @@ class WPGym_Admin_Pages
     public function render_user_management()
     {
     ?>
-        <div class="wrap">
+        <div class="user-wrap">
             <style>
                 .badge {
                     font-size: 0.875rem;
@@ -96,6 +89,9 @@ class WPGym_Admin_Pages
             </div>
 
             <div class="table-responsive">
+        <div id="gym-management-notices"></div>
+
+            <button id="add-new-member" class="button button-primary">Add New Member</button>
                 <table class="table table-hover align-middle shadow-sm">
                     <thead class="table-light small text-muted">
                         <tr>

@@ -37,6 +37,13 @@ class GymMembershipRegistration
         add_action('wp_ajax_verify_payment_and_create_user', array($this, 'verify_payment_and_create_user'));
         add_action('wp_ajax_nopriv_verify_payment_and_create_user', array($this, 'verify_payment_and_create_user'));
     }
+    public function render_admin_notice($message, $type = 'success') {
+        return sprintf(
+            '<div class="notice notice-%1$s is-dismissible"><p>%2$s</p></div>',
+            esc_attr($type),
+            esc_html($message)
+        );
+    }
 
     public function create_gym_member_role()
     {
@@ -60,7 +67,7 @@ class GymMembershipRegistration
 
     public function enqueue_frontend_scripts()
     {
-        wp_enqueue_script('gym-members-frontend', plugin_dir_url(__FILE__) . 'js/frontend.js', array('jquery'), '1.0', true);
+        wp_enqueue_script('gym-members-frontend', plugin_dir_url(__DIR__) . '/assets/js/frontend.js', array('jquery'), '1.0', true);
         wp_localize_script('gym-members-frontend', 'gymMembersFrontend', array(
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('gym_members_nonce')
@@ -79,14 +86,9 @@ class GymMembershipRegistration
 
     public function ajax_get_gym_members()
     {
-        if (!check_ajax_referer('gym_members_nonce', 'nonce', false)) {
-            $this->log_error('Nonce verification failed');
-            wp_send_json_error('Nonce verification failed', 400);
-        }
-
+        check_ajax_referer('gym_members_nonce', 'nonce');
         if (!current_user_can('manage_options')) {
-            $this->log_error('Unauthorized access attempt');
-            wp_send_json_error('Unauthorized', 403);
+            wp_send_json_error('Unauthorized');
         }
 
         $users = get_users(array(
@@ -95,12 +97,10 @@ class GymMembershipRegistration
             'order' => 'DESC'
         ));
 
-        if (empty($users)) {
-            $this->log_error('No gym members found');
-            wp_send_json_error('No gym members found', 404);
-        }
-
         ob_start();
+        if (empty($users)) {
+            echo '<tr><td colspan="7">No gym members found.</td></tr>';
+        } else {
         foreach ($users as $user) {
             $unique_id = get_user_meta($user->ID, 'unique_id', true);
             $membership_type_id = get_user_meta($user->ID, 'membership_type', true);
@@ -155,6 +155,7 @@ class GymMembershipRegistration
             </tr>
 <?php
         }
+    }
         $html = ob_get_clean();
 
         if (empty($html)) {
@@ -205,6 +206,7 @@ class GymMembershipRegistration
         $password = $_POST['password'];
         $membership_type = sanitize_text_field($_POST['membership_type']);
         $status = sanitize_text_field($_POST['status']);
+        $payment_status = sanitize_text_field($_POST['paymentstatus']);
 
         // Validate input
         if (empty($username) || empty($email) || empty($password)) {
@@ -230,11 +232,7 @@ class GymMembershipRegistration
             wp_send_json_error('Error creating user: ' . $user_id->get_error_message());
         }
 
-        // $user_id = wp_create_user($username, $password, $email);
-        // if (is_wp_error($user_id)) {
-        //     $this->log_error('Error creating user: ' . $user_id->get_error_message());
-        //     wp_send_json_error('Error creating user: ' . $user_id->get_error_message());
-        // }
+        
 
         $user = new WP_User($user_id);
         $user->set_role('gym_member');
@@ -246,10 +244,14 @@ class GymMembershipRegistration
         update_user_meta($user_id, 'unique_id', $unique_id);
         update_user_meta($user_id, 'membership_type', $membership_type);
         update_user_meta($user_id, 'status', $status);
+        update_user_meta($user_id, 'payment_staus', $payment_status);
         update_user_meta($user_id, 'registration_date', $registration_date);
         update_user_meta($user_id, 'end_date', $end_date);
 
-        wp_send_json_success('Member added successfully');
+        wp_send_json_success(array(
+            'message' => 'Member added successfully',
+            'notice' => $this->render_admin_notice('Member added successfully', 'success')
+        ));
     }
 
     public function ajax_edit_gym_member()
@@ -264,7 +266,10 @@ class GymMembershipRegistration
         $membership_type = sanitize_text_field($_POST['membership_type']);
         $status = sanitize_text_field($_POST['status']);
         $unique_id = get_user_meta($user_id, 'unique_id', true);
-        $unique_id = get_user_meta($user_id, 'unique_id', true);
+        $payment_status = sanitize_text_field($_POST['paymentstatus']);
+        $username = sanitize_user($_POST['username']);
+
+
 
         $user_data = array(
             'ID' => $user_id,
@@ -281,6 +286,8 @@ class GymMembershipRegistration
         }
         update_user_meta($user_id, 'membership_type', $membership_type);
         update_user_meta($user_id, 'status', $status);
+        update_user_meta($user_id, 'payment_staus', $payment_status);
+
 
         /**
          * CHeck if status is inactive remove from access control
@@ -294,14 +301,17 @@ class GymMembershipRegistration
             [
                 // "EnrollNumber" => $unique_id,
                 "EnrollNumber" => "3434",
-                "Name" => "John Doe Only hj",
+                "Name" => $username,
                 "Password" => "1234",
                 "Privilege" => 0,
             ];
             // WPGymAccessControl::updateUser($userData);
         }
 
-        wp_send_json_success('Member updated successfully');
+        wp_send_json_success(array(
+            'message' => 'Member updated successfully',
+            'notice' => $this->render_admin_notice('Member updated successfully', 'success')
+        ));
     }
 
     public function ajax_delete_gym_member()
@@ -314,9 +324,15 @@ class GymMembershipRegistration
         $user_id = intval($_POST['user_id']);
         // WPGymAccessControl::deleteUser($uniq_id)
         if (wp_delete_user($user_id)) {
-            wp_send_json_success('Member deleted successfully');
+            wp_send_json_success(array(
+                'message' => 'Member deleted successfully',
+                'notice' => $this->render_admin_notice('Member deleted successfully', 'success')
+            ));
         } else {
-            wp_send_json_error('Failed to delete member');
+            wp_send_json_error(array(
+                'message' => 'Failed to delete member',
+                'notice' => $this->render_admin_notice('Failed to delete member', 'error')
+            ));
         }
     }
 
@@ -334,20 +350,32 @@ class GymMembershipRegistration
 
         // Validate input
         if (empty($username) || empty($email) || empty($password)) {
-            wp_send_json_error('Username, email, and password are required');
+            wp_send_json_error(array(
+                'message' => 'Username, email, and password are required',
+                'notice' => $this->render_admin_notice('Username, email, and password are required', 'error')
+            ));
         }
 
         if (!is_email($email)) {
-            wp_send_json_error('Invalid email address');
+            wp_send_json_error(array(
+                'message' => 'Invalid email address',
+                'notice' => $this->render_admin_notice('Invalid email address', 'error')
+            ));
         }
 
         // Check if username or email already exists
         if (username_exists($username)) {
-            wp_send_json_error('Username already exists');
+            wp_send_json_error(array(
+                'message' => 'Username already exists',
+                'notice' => $this->render_admin_notice('Username already exists', 'error')
+            ));
         }
 
         if (email_exists($email)) {
-            wp_send_json_error('Email address already exists');
+            wp_send_json_error(array(
+                'message' => 'Email address already exists',
+                'notice' => $this->render_admin_notice('Email address already exists', 'error')
+            ));
         }
 
         $response = PeachPayments::initiatePayment(
@@ -399,53 +427,7 @@ class GymMembershipRegistration
         // // wp_send_json_success('Registration successful');
         wp_die();
     }
-    // public function ajax_register_gym_member() {
-    //     check_ajax_referer('gym_members_nonce', 'nonce');
-
-    //     $username = sanitize_user($_POST['username']);
-    //     $email = sanitize_email($_POST['email']);
-    //     $password = $_POST['password'];
-    //     $membership_type = sanitize_text_field($_POST['membership_type']);
-
-    //     // Validate input
-    //     if (empty($username) || empty($email) || empty($password)) {
-    //         wp_send_json_error('Username, email, and password are required');
-    //     }
-
-    //     if (!is_email($email)) {
-    //         wp_send_json_error('Invalid email address');
-    //     }
-
-    //     // Check if username or email already exists
-    //     if (username_exists($username)) {
-    //         wp_send_json_error('Username already exists');
-    //     }
-
-    //     if (email_exists($email)) {
-    //         wp_send_json_error('Email address already exists');
-    //     }
-
-    //     // Dummy payment process
-    //     $payment_successful = $this->process_payment($_POST['payment_data']);
-
-    //     if (!$payment_successful) {
-    //         wp_send_json_error('Payment failed');
-    //     }
-
-    //     $user_id = wp_create_user($username, $password, $email);
-    //     if (is_wp_error($user_id)) {
-    //         $this->log_error('Error creating user: ' . $user_id->get_error_message());
-    //         wp_send_json_error('Error creating user: ' . $user_id->get_error_message());
-    //     }
-
-    //     $user = new WP_User($user_id);
-    //     $user->set_role('gym_member'); // Ensure the user is assigned the gym_member role
-
-    //     update_user_meta($user_id, 'membership_type', $membership_type);
-    //     update_user_meta($user_id, 'status', 'active');
-
-    //     wp_send_json_success('Registration successful');
-    // }
+    
     private function generate_unique_id()
     {
         $prefix = 'GYM';

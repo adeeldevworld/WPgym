@@ -1,10 +1,13 @@
-<div class="wrap">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="m-0"><?= __('Add New Membership', 'wpgym') ?></h1>
-        <a href="?page=membership-manager" class="btn btn-outline-secondary btn-sm">
-            <?= __('Back to Membership List', 'wpgym') ?>
-        </a>
-    </div>
+<div id="add-membership-modal" style="display: none;">
+    <div class="add-membership-content">
+        <div class="modal-overlay">
+            <div class="modal-dialog modal-dialog-centered" style=" width:100% ;max-width: 800px; margin: 50px auto;">
+                <div class="modal-content shadow" style="background-color: #ffffff; border: none;">
+                    <div class="modal-header border-bottom-0 mb-1">
+                        <h2 class="modal-title"><?= __('Add Membership', 'wpgym') ?></h2>
+                        <button type="button" class="btn-close btn-close-dark" aria-label="Close" id="add-cancel"></button>
+                    </div>
+                    <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
 
     <form id="add-membership-form" method="post" class="bg-white p-4 rounded shadow-sm">
         <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('membership-manager-nonce'); ?>">
@@ -81,7 +84,11 @@
             </div>
         </div>
     </form>
-</div>
+    </div>
+                    
+                </div>
+            </div>
+        </div>
 
 <style>
     .wrap {
@@ -138,3 +145,4 @@
         }
     }
 </style>
+

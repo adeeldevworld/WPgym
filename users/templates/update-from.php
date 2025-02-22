@@ -6,6 +6,12 @@ if (!defined('ABSPATH')) {
 
 <div id="member-modal" style="display:none;">
     <div class="modal-content bg-white p-4 rounded shadow-sm">
+        <div class="modal-header border-bottom-0">
+            <h2 class="modal-title"><?= __('Member Info', 'wpgym') ?></h2>
+            <button type="button" class="btn-close btn-close-dark" aria-label="Close" id="add-cancel"></button>
+        </div>
+        <div id="gym-management-notices"></div>
+
         <form id="member-form">
             <input type="hidden" id="user-id" name="user_id">
             <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('gym_members_nonce'); ?>">
@@ -35,6 +41,7 @@ if (!defined('ABSPATH')) {
                 <label for="membership-type" class="col-sm-4 col-form-label"><?= __('Membership Type', 'wpgym') ?></label>
                 <div class="col-sm-8">
                     <select id="membership-type" name="membership_type" class="form-select form-select-lg" required style="min-height: 40px;">
+                        <option value=""><?= __(' Select Membership Type', 'wpgym') ?></option>
                         <?php
                         global $wpdb;
                         $table_name = $wpdb->prefix . 'memberships';
@@ -60,6 +67,15 @@ if (!defined('ABSPATH')) {
                     <select id="status" name="status" class="form-select form-select-lg" required style="min-height: 40px;">
                         <option value="active"><?= __('Active', 'wpgym') ?></option>
                         <option value="inactive"><?= __('Inactive', 'wpgym') ?></option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="status" class="col-sm-4 col-form-label"><?= __('Payment Status', 'wpgym') ?></label>
+                <div class="col-sm-8">
+                    <select id="paymentstatus" name="paymentstatus" class="form-select form-select-lg" required style="min-height: 40px;">
+                        <option value="success"><?= __('Success', 'wpgym') ?></option>
+                        <option value="panding"><?= __('Pending', 'wpgym') ?></option>
                     </select>
                 </div>
             </div>

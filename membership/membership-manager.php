@@ -18,9 +18,34 @@ class MembershipManager {
         add_action('wp_ajax_edit_membership', array($this, 'ajax_edit_membership'));
         add_action('wp_ajax_get_membership', array($this, 'ajax_get_membership'));
         add_action('wp_ajax_delete_membership', array($this, 'ajax_delete_membership'));
+        add_action('admin_notices', array($this, 'display_admin_notices'));
     }
 
-   
+    public function render_admin_notice($message, $type = 'success') {
+        return sprintf(
+            '<div class="notice notice-%1$s is-dismissible"><p>%2$s</p></div>',
+            esc_attr($type),
+            esc_html($message)
+        );
+    }
+    public function set_admin_notice($message, $type = 'success') {
+        $notices = get_transient('gym_management_admin_notices') ?: array();
+        $notices[] = array(
+            'message' => $message,
+            'type' => $type
+        );
+        set_transient('gym_management_admin_notices', $notices, 60);
+    }
+
+    public function display_admin_notices() {
+        $notices = get_transient('gym_management_admin_notices');
+        if ($notices) {
+            foreach ($notices as $notice) {
+                echo '<div class="notice notice-' . esc_attr($notice['type']) . ' is-dismissible"><p>' . esc_html($notice['message']) . '</p></div>';
+            }
+            delete_transient('gym_management_admin_notices');
+        }
+    }
     public function enqueue_admin_scripts($hook) {
         if ('memberships_page_add-new-membership' !== $hook && 'toplevel_page_membership-manager' !== $hook) {
           //  return;
@@ -64,11 +89,17 @@ class MembershipManager {
             if ($result === false) {
                 throw new Exception('Failed to add membership: ' . $wpdb->last_error);
             } else {
-                wp_send_json_success('Membership added successfully');
+                wp_send_json_success(array(
+                    'message' => 'Membership added successfully',
+                    'notice' => $this->render_admin_notice('Member added successfully', 'success')
+                ));
             }
         } catch (Exception $e) {
             error_log('Error in ajax_add_membership: ' . $e->getMessage());
-            wp_send_json_error($e->getMessage());
+            wp_send_json_error(array(
+                'message' => $e->getMessage(),
+                'notice' => $this->render_admin_notice($e->getMessage(), 'error')
+            ));
         }
     }
     
@@ -100,9 +131,16 @@ class MembershipManager {
         $wpdb->update($table_name, $data, array('id' => $id));
     
         if ($wpdb->last_error) {
-            wp_send_json_error('Failed to update membership');
+            wp_send_json_error(array(
+                'message' => 'Failed to update membership',
+                'notice' => $this->render_admin_notice('Failed to update membership', 'error')
+            )
+                );
         } else {
-            wp_send_json_success('Membership updated successfully');
+            wp_send_json_success(array(
+                'message' => 'Membership updated successfully',
+                'notice' => $this->render_admin_notice('Membership updated successfully', 'success')
+            ));
         }
     }
     
@@ -151,9 +189,15 @@ class MembershipManager {
         $wpdb->delete($table_name, array('id' => $id));
 
         if ($wpdb->last_error) {
-            wp_send_json_error('Failed to delete membership');
+            wp_send_json_error(array(
+                'message' => 'Failed to delete membership',
+                'notice' => $this->render_admin_notice('Failed to delte membership', 'error')
+            ));
         } else {
-            wp_send_json_success('Membership deleted successfully');
+            wp_send_json_success(array(
+                'message' => 'Membership deleted successfully',
+                'notice' => $this->render_admin_notice('Membership deleted successfully', 'success')
+            ));
         }
     }
 }
