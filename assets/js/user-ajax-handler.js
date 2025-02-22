@@ -38,8 +38,9 @@ jQuery(document).ready(function($) {
         $('#member-form').on('submit', function(e) {
             e.preventDefault();
             var formData = $(this).serialize();
-            formData += '&action=' + ($('#user-id').val() ? 'edit_gym_member' : 'add_gym_member');
-            formData += '&nonce=' + gymMembersAdmin.nonce;
+            //formData += '&action=' + ($('#user-id').val() ? 'edit_gym_member' : 'add_gym_member');
+            formData += '&action=add_gym_member';
+            
     
             $.ajax({
                 url: gymMembersAdmin.ajax_url,
@@ -49,9 +50,11 @@ jQuery(document).ready(function($) {
                     if (response.success) {
                         $('#member-modal').hide();
                         loadMembers(); // Reload the member list after adding/editing
-                        alert('Member saved successfully');
+                       // alert('Member saved successfully');
+                       showAdminNotice(response.data.notice);
                     } else {
-                        alert('Error: ' + response.data);
+                       // alert('Error: ' + response.data);
+                       showAdminNotice(response.data.notice);
                     }
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
@@ -129,8 +132,8 @@ jQuery(document).ready(function($) {
     $('#member-form').on('submit', function(e) {
         e.preventDefault();
         var formData = $(this).serialize();
-        formData += '&action=' + ($('#user-id').val() ? 'edit_gym_member' : 'add_gym_member');
-        formData += '&nonce=' + gymMembersAdmin.nonce;
+        formData += '&action=edit_gym_member';
+        //formData += '&nonce=' + gymMembersAdmin.nonce;
     
         $.ajax({
             url: gymMembersAdmin.ajax_url,
@@ -139,10 +142,12 @@ jQuery(document).ready(function($) {
             success: function(response) {
                 if (response.success) {
                     $('#member-modal').hide();
+                    showAdminNotice(response.data.notice);
                     loadMembers();
-                    alert('Member saved successfully');
+                   // alert('Member saved successfully');
                 } else {
-                    alert('Error: ' + response.data);
+                    //alert('Error: ' + response.data);
+                    showAdminNotice(response.data.notice);
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -174,4 +179,21 @@ jQuery(document).ready(function($) {
             }
         });
     });
+    function showAdminNotice(notice) {
+        var $noticeContainer = $('#gym-management-notices');
+        if (!$noticeContainer.length) {
+            $noticeContainer = $('<div id="gym-management-notices"></div>');
+            $('.wrap h1').after($noticeContainer);
+        }
+        $noticeContainer.html(notice);
+        
+        // Set up dismissible notices
+        $('.notice-dismiss').on('click', function() {
+            $(this).closest('.notice').remove();
+        });
+    }
+    $('#add-cancel').on('click', function() {
+        $('#member-modal').hide();
+    });
+
 });

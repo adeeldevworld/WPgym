@@ -1,10 +1,13 @@
-<div class="wrap">
+<div class="mem-wrapper">
+<div id="gym-management-notices"></div>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="m-0"><?= __('All Memberships', 'wpgym') ?></h1>
-        <a href="?page=add-new-membership" class="btn btn-primary btn-md">
+       
+        <button class="btn btn-primary btn-md add-membership">
             <?= __('Add New Membership', 'wpgym') ?>
-        </a>
+        </button>
     </div>
+    <div 
     <div class="table-responsive">
         <table class="table table-striped table-hover align-middle">
             <thead class="table-dark">
@@ -183,3 +186,5 @@
         </style>
     </div>
 </div>
+<?php
+include(plugin_dir_path(__FILE__) . 'add-new-membership.php');
