@@ -41,6 +41,3 @@
     </button>
 </form>
 <div id="wpgym-formRespnse"></div>
-<script>
-    
-</script>

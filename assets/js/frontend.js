@@ -81,3 +81,59 @@ jQuery(document).ready(function($) {
         });
     }
 });
+jQuery(document).ready(function($) {
+    // Toggle between monthly and yearly memberships
+    $('.toggle-btn').on('click', function() {
+        $('.toggle-btn').removeClass('active');
+        $(this).addClass('active');
+        var duration = $(this).data('duration');
+        $('.membership-item').hide();
+        $('.membership-item[data-duration="' + duration + '"]').show();
+    });
+
+    // Show only monthly memberships by default
+    $('.membership-item[data-duration="monthly"]').show();
+    $('.membership-item[data-duration="yearly"]').hide();
+
+    // Open registration modal
+    $('.join-btn').on('click', function() {
+        var membershipId = $(this).data('id');
+        var membershipType = $(this).siblings('h3').text();
+        var price = $(this).data('price');
+
+        $('#membership_id').val(membershipId);
+        $('#membership_type').val(membershipType);
+        $('#price').val(price);
+
+        $('#registration-modal').show();
+    });
+
+    // Close registration modal
+    $('#member-modal').on('click', function(e) {
+        if (e.target === this) {
+            $(this).hide();
+        }
+    });
+
+    // Handle registration form submission
+    $('#registration-form').on('submit', function(e) {
+        e.preventDefault();
+        var formData = $(this).serialize();
+        formData += '&action=register_gym_member';
+        formData += '&nonce=' + gymManagementFrontend.nonce;
+
+        $.ajax({
+            url: gymManagementFrontend.ajax_url,
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                if (response.success) {
+                    alert('Registration successful!');
+                    $('#registration-modal').hide();
+                } else {
+                    alert('Error: ' + response.data);
+                }
+            }
+        });
+    });
+});

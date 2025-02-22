@@ -32,6 +32,8 @@ class WPGym_Asset_Loader
             '5.3.2',
             true
         );
+        wp_enqueue_style('gym-management-frontend', plugin_dir_url(__DIR__) . 'assets/css/style.css');
+
     }
 
     /**
