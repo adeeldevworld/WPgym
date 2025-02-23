@@ -19,6 +19,20 @@ class MembershipManager {
         add_action('wp_ajax_get_membership', array($this, 'ajax_get_membership'));
         add_action('wp_ajax_delete_membership', array($this, 'ajax_delete_membership'));
         add_action('admin_notices', array($this, 'display_admin_notices'));
+        add_shortcode('gym_memberships', array($this, 'gym_memberships_shortcode'));
+    }
+    
+    public function gym_memberships_shortcode($atts) {
+        wp_enqueue_script('gym-management-frontend');
+    
+        global $wpdb;
+            $table_name = $wpdb->prefix . 'memberships';
+            $memberships = $wpdb->get_results("SELECT * FROM $table_name");
+
+        
+        ob_start();
+        include plugin_dir_path(__FILE__) . 'templates/frontend-memberships.php';
+        return ob_get_clean();
     }
 
     public function render_admin_notice($message, $type = 'success') {
